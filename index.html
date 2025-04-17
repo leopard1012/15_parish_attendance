@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교회 출석체크 (15교구)</title>
+    <link rel="stylesheet" href="style.css">
+    </head>
+<body>
+    <h1>15교구 출석 체크</h1>
+
+    <div id="selection-page">
+        <h2>조직 및 기간 선택</h2>
+        <div class="form-group">
+            <label for="region-select">지역:</label>
+            <select id="region-select" disabled>
+                <option value="">-- 지역 선택 --</option>
+                </select>
+        </div>
+        <div class="form-group">
+            <label for="group-select">조:</label>
+            <select id="group-select" disabled>
+                <option value="">-- 조 선택 --</option>
+                </select>
+        </div>
+        <div class="form-group">
+            <label for="mokjang-select">목장:</label>
+            <select id="mokjang-select" disabled>
+                <option value="">-- 목장 선택 --</option>
+                </select>
+        </div>
+        <div class="form-group">
+            <label for="year-select">연도:</label>
+            <select id="year-select">
+                </select>
+            </div>
+        <div class="form-group">
+            <label for="month-select">월:</label>
+            <select id="month-select">
+                </select>
+        </div>
+        <button id="view-attendance-btn" disabled>조회</button>
+        <p id="selection-error" class="error-message"></p>
+    </div>
+
+    <div id="attendance-page" style="display: none;">
+        <h2 id="attendance-header"></h2>
+        <button id="back-to-selection-btn">뒤로가기</button>
+        <div id="attendance-table-container">
+            <p>로딩 중...</p>
+            </div>
+        <button id="save-attendance-btn">확인 (저장)</button>
+        <p id="status-message"></p>
+    </div>
+
+    <script src="script.js"></script>
+    </body>
+</html>

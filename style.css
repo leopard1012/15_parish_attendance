@@ -1,0 +1,158 @@
+body {
+    font-family: 'Malgun Gothic', sans-serif; /* 한국어 환경에 맞는 폰트 */
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+h1, h2 {
+    text-align: center;
+    color: #333;
+}
+
+#selection-page, #attendance-page {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    max-width: 800px; /* 너비 제한 */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group select, .form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* 패딩 포함 너비 계산 */
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-right: 10px;
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+#back-to-selection-btn {
+    background-color: #6c757d;
+}
+#back-to-selection-btn:hover {
+    background-color: #5a6268;
+}
+
+#attendance-table-container {
+    margin-top: 20px;
+    overflow-x: auto; /* 테이블 가로 스크롤 허용 */
+}
+
+#attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+#attendance-table th, #attendance-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    min-width: 80px; /* 열 최소 너비 확보 */
+    word-break: keep-all; /* 단어 중간 줄바꿈 방지 (이름 등에 유용) */
+}
+
+#attendance-table th {
+    background-color: #f2f2f2;
+}
+
+#attendance-table td:first-child { /* 이름 열 */
+    text-align: left;
+    font-weight: bold;
+    background-color: #f8f9fa;
+    min-width: 100px;
+}
+
+/* 3단 상태 체크박스 스타일 */
+.attendance-checkbox {
+    display: inline-block;
+    width: 22px; /* 크기 조정 */
+    height: 22px;
+    border: 1px solid #ccc;
+    border-radius: 4px; /* 약간 둥글게 */
+    cursor: pointer;
+    vertical-align: middle;
+    box-sizing: border-box;
+    position: relative; /* 가상 요소 위치 기준 */
+    background-color: #ffffff; /* 기본 배경색 (미출석) */
+    transition: background-color 0.2s ease, border-color 0.2s ease; /* 부드러운 전환 효과 */
+}
+
+/* 상태 0: 미출석 (기본 스타일) */
+.attendance-checkbox[data-state="0"] {
+    background-color: #ffffff;
+}
+
+/* 상태 1: 비대면 (V 표시) */
+.attendance-checkbox[data-state="1"]::before {
+    content: '✓'; /* 체크 표시 */
+    color: #007bff; /* 파란색 */
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px; /* 아이콘 크기 */
+}
+
+/* 상태 2: 대면 (채워진 박스) */
+.attendance-checkbox[data-state="2"] {
+    background-color: #28a745; /* 초록색 */
+    border-color: #28a745;
+}
+
+
+.error-message {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+#status-message {
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+#status-message.success {
+    color: green;
+}
+
+#status-message.error {
+    color: red;
+}
+
+#status-message.loading {
+    color: #666;
+}
