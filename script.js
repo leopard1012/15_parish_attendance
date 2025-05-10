@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tableContainer = document.getElementById('attendance-table-container');
     const saveBtn = document.getElementById('save-attendance-btn');
     const statusMessage = document.getElementById('status-message');
+    const loadingOverlay = document.getElementById('loading-overlay');
 
     // --- 상수 ---
     const ATTENDANCE_STATES = {
@@ -108,35 +109,44 @@ document.addEventListener('DOMContentLoaded', () => {
      * @throws {Error} 네트워크 오류 또는 Apps Script 오류 발생 시
      */
     async function fetchDataFromAppsScript(action, params = {}) {
-        const url = new URL(APPS_SCRIPT_URL);
-        url.searchParams.append('action', action);
-        for (const key in params) {
-            // 파라미터 값이 배열이나 객체일 경우 JSON 문자열로 변환
-            const value = typeof params[key] === 'object' ? JSON.stringify(params[key]) : params[key];
-            url.searchParams.append(key, value);
+        showGlobalSpinner();
+
+        try {
+            const url = new URL(APPS_SCRIPT_URL);
+            url.searchParams.append('action', action);
+            for (const key in params) {
+                // 파라미터 값이 배열이나 객체일 경우 JSON 문자열로 변환
+                const value = typeof params[key] === 'object' ? JSON.stringify(params[key]) : params[key];
+                url.searchParams.append(key, value);
+            }
+
+            console.log(`Apps Script 호출 (${action}): ${url.toString()}`); // 호출 URL 로그
+
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                // 서버 응답 코드가 200-299 범위가 아닐 때
+                const errorText = await response.text(); // 오류 응답 내용 확인 시도
+                console.error(`서버 응답 오류 (${response.status}): ${errorText}`);
+                throw new Error(`서버 응답 오류: ${response.status} ${response.statusText}`);
+            }
+
+            const result = await response.json(); // 응답 본문을 JSON으로 파싱
+
+            if (!result.success) {
+                // Apps Script에서 success: false 와 함께 오류 메시지를 보낸 경우
+                console.error("Apps Script 오류:", result.error);
+                throw new Error(result.error || "Apps Script에서 알 수 없는 오류 발생");
+            }
+
+            console.log(`Apps Script 응답 (${action}):`, result.data);
+            return result.data; // 성공 시 data 필드 반환
+        } catch (error) {
+            console.error(`WorkspaceDataFromAppsScript (${action}) 실패:`, error);
+            throw error; // 에러를 다시 던져 호출한 함수에서 처리할 수 있도록 함
+        } finally {
+            hideGlobalSpinner(); // <<< 스피너 숨김
         }
-
-        console.log(`Apps Script 호출 (${action}): ${url.toString()}`); // 호출 URL 로그
-
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            // 서버 응답 코드가 200-299 범위가 아닐 때
-            const errorText = await response.text(); // 오류 응답 내용 확인 시도
-            console.error(`서버 응답 오류 (${response.status}): ${errorText}`);
-            throw new Error(`서버 응답 오류: ${response.status} ${response.statusText}`);
-        }
-
-        const result = await response.json(); // 응답 본문을 JSON으로 파싱
-
-        if (!result.success) {
-            // Apps Script에서 success: false 와 함께 오류 메시지를 보낸 경우
-            console.error("Apps Script 오류:", result.error);
-            throw new Error(result.error || "Apps Script에서 알 수 없는 오류 발생");
-        }
-
-        console.log(`Apps Script 응답 (${action}):`, result.data);
-        return result.data; // 성공 시 data 필드 반환
     }
 
     // '목자' 시트 데이터 가져오기 (캐시 활용)
@@ -261,13 +271,27 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let day = 1; day <= daysInMonth; day++) { date.setDate(day); if (date.getDay() === 0) { sundays.push(`${month}/${day}`); } }
         return sundays;
     }
-    function createAttendanceTable(members, sundays, attendanceData) { // (변경 없음)
-        const table = document.createElement('table'); table.id = 'attendance-table'; table.classList.add('attendance-table');
-        const thead = table.createTHead(); const headerRow = thead.insertRow(); headerRow.insertCell();
-        sundays.forEach(sundayDate => { const th = document.createElement('th'); th.textContent = sundayDate; headerRow.appendChild(th); });
+    function createAttendanceTable(members, sundays, attendanceData) {
+        const table = document.createElement('table'); 
+        table.id = 'attendance-table'; 
+        // table.classList.add('attendance-table');
+        const thead = table.createTHead(); 
+        const headerRow = thead.insertRow();
+        const cornerTh = document.createElement('th');
+        // headerRow.insertCell();
+        cornerTh.textContent = '이름/날짜';
+        headerRow.appendChild(cornerTh);
+
+        sundays.forEach(sundayDate => {
+            const th = document.createElement('th'); 
+            th.textContent = sundayDate; 
+            headerRow.appendChild(th); 
+        });
+
         const tbody = table.createTBody();
         members.forEach(memberName => {
-            const row = tbody.insertRow(); row.insertCell().textContent = memberName;
+            const row = tbody.insertRow(); 
+            row.insertCell().textContent = memberName;
             sundays.forEach(sundayDate => {
                 const cell = row.insertCell(); const checkbox = document.createElement('div');
                 checkbox.classList.add('attendance-checkbox'); checkbox.dataset.name = memberName; checkbox.dataset.date = sundayDate;
@@ -373,6 +397,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function showSuccessMessage(message) { statusMessage.textContent = message; statusMessage.className = 'success'; }
     function showInfoMessage(message, container = tableContainer ) { container.innerHTML = `<p>${message}</p>`; }
     function clearStatusMessage() { statusMessage.textContent = ''; statusMessage.className = ''; }
+
+    function showGlobalSpinner() {
+        if (loadingOverlay) loadingOverlay.style.display = 'flex';
+    }
+    
+    function hideGlobalSpinner() {
+        if (loadingOverlay) loadingOverlay.style.display = 'none';
+    }
 
     // --- 애플리케이션 시작 ---
     init(); // 초기화 함수 호출

@@ -10,7 +10,7 @@
     <h1>15교구 출석 체크</h1>
 
     <div id="selection-page">
-        <h2>조직 및 기간 선택</h2>
+        <h2>목장 및 기간 선택</h2>
         <div class="form-group">
             <label for="region-select">지역:</label>
             <select id="region-select" disabled>
@@ -46,11 +46,20 @@
     <div id="attendance-page" style="display: none;">
         <h2 id="attendance-header"></h2>
         <button id="back-to-selection-btn">뒤로가기</button>
+        <div id="attendance-guide">
+            <p><img src="image/off.png" alt="불참" style="vertical-align: middle; margin-right: 5px;"> : 불참</p>
+            <p><img src="image/on(out).png" alt="비대면 참석" style="vertical-align: middle; margin-right: 5px;"> : 비대면 참석</p>
+            <p><img src="image/on(in).png" alt="대면 참석" style="vertical-align: middle; margin-right: 5px;"> : 대면 참석</p>
+        </div>
         <div id="attendance-table-container">
             <p>로딩 중...</p>
             </div>
         <button id="save-attendance-btn">확인 (저장)</button>
         <p id="status-message"></p>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
     </div>
 
     <script src="script.js"></script>
