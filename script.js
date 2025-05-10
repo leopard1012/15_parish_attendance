@@ -306,7 +306,25 @@ document.addEventListener('DOMContentLoaded', () => {
         tableContainer.innerHTML = ''; tableContainer.appendChild(table);
     }
     function handleCheckboxClick(checkboxElement) { // (변경 없음)
-        let currentState = parseInt(checkboxElement.dataset.state); let nextState = (currentState + 1) % 3;
+        // 1번 선택은 비대면, 2번선택은 대면
+        // let currentState = parseInt(checkboxElement.dataset.state); let nextState = (currentState + 1) % 3;
+
+        let currentState = parseInt(checkboxElement.dataset.state);
+        let nextState;
+
+        // 상태 전환 로직 변경
+        // 0 (불참) -> 2 (대면) -> 1 (비대면) -> 0 (불참)
+        if (currentState === ATTENDANCE_STATES.ABSENT) { // 현재 상태: 불참 (0)
+            nextState = ATTENDANCE_STATES.IN_PERSON;     // 다음 상태: 대면 참석 (2)
+        } else if (currentState === ATTENDANCE_STATES.IN_PERSON) { // 현재 상태: 대면 참석 (2)
+            nextState = ATTENDANCE_STATES.ONLINE;        // 다음 상태: 비대면 참석 (1)
+        } else if (currentState === ATTENDANCE_STATES.ONLINE) { // 현재 상태: 비대면 참석 (1)
+            nextState = ATTENDANCE_STATES.ABSENT;        // 다음 상태: 불참 (0)
+        } else {
+            // 예외 처리: 혹시 모를 다른 상태 값일 경우 불참(0)으로 초기화
+            nextState = ATTENDANCE_STATES.ABSENT;
+        }
+        
         checkboxElement.dataset.state = nextState;
         console.log(`체크박스 변경: 이름=${checkboxElement.dataset.name}, 날짜=${checkboxElement.dataset.date}, 새 상태=${nextState}`);
     }
